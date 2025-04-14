@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.get('/testimonials', (req, res) => {
     res.json(db.testimonials);
-    console.log('hello')
+
 });
 
 app.get('/testimonials/random', (req, res) => {
@@ -45,7 +45,7 @@ app.post('/testimonials', (req, res) => {
 
 app.put('/testimonials/:id', (req, res) => {
     const id = req.params.id;
-    const testimonial = db.testimonials.find(item => item.id === parseInt(id));
+    const testimonial = db.testimonials.findIndex(item => String(item.id) === String(id));
 
     if (!testimonial) {
         return res.status(404).json({ message: 'Testimonial not found' });
@@ -57,11 +57,11 @@ app.put('/testimonials/:id', (req, res) => {
         return res.status(400).json({ message: 'Invalid data. Both author and text are required.' });
     }
 
-    testimonial.author = author;
-    testimonial.text = text;
+    db.testimonials[testimonial] = { ...db.testimonials[testimonial], author, text };
 
-    res.json(testimonial);
+    res.json({ message: 'OK' });
 });
+
     
 app.delete('/testimonials/:id', (req, res) => {
     const id = req.params.id
@@ -74,8 +74,65 @@ app.delete('/testimonials/:id', (req, res) => {
         res.status(404).json({ message: 'Testimonial not found' }); // Obsługa błędu
     }
 })
+
+app.get('/concerts', (req, res) => {
+    res.json(db.concerts);
+});
+
+app.get('/concerts/random', (req, res) => {
+    const random = db.concerts[Math.floor(Math.random() * db.concerts.length)];
+    res.json(random);
+});
   
-  
+app.get('/concerts/:id', (req, res) => {
+    const id = req.params.id
+    const concert = db.concerts.findIndex(item => String(item.id) === String(id)); // znajdz mi item z takim item.id (concerts/2 to jego item.id jest 2) jak id (czyli wlasnie np concerts/2)
+    res.json(db.concerts[concert]);
+});
+
+app.post('/concerts', (req, res) => {
+    const id = uuidv4();
+    const { performer, genre, price, day, image } = req.body;
+    if (!performer || !genre || !price || !day || !image || !id){
+        res.json({ message: 'error!'});
+    } else {
+        db.concerts.push({ performer, genre, price, day, image, id})
+        res.json({ message: 'OK'})
+    }
+});
+
+app.put('/concerts/:id', (req, res) => {
+    const id = req.params.id
+    const concert = db.concerts.findIndex(item => String(item.id) === String(id))
+    const { performer, genre, price, day, image } = req.body;
+    if (!concert){
+        res.json({ message: 'wrong id!'});
+    } else if (!performer || !genre || !price || !day || !image ){
+        res.json({ message: 'error!'})
+    } else {
+        db.concerts[concert] = { ...db.concerts[concert], performer, genre, price, day, image}; // *...db.concerts[concert]* =  stworz mi takie samo i usun tamto (obiekt np id:3 "performer": "Maybell Haley", genre itd)
+                                                                                                // *performer, genre, price, day, image* i zastap argumentami z req.body
+        res.json({  message: 'OK' });
+    }
+})
+
+app.delete('/concerts/:id', (req, res) => {
+    const id = req.params.id;
+    const concert = db.concerts.findIndex(item => String(item.id) === String(id));
+
+    if(concert !== -1) {
+        db.concerts.splice(concert, 1);
+        res.json({ message: 'OK' });
+    } else {
+        res.status(404).json({ message: 'Testimonial not found' });
+    }
+});
+
+//SEATS
+
+app.get('/seats', (req, res) => {
+    res.json(db.seats);
+})
 
 app.listen(8000, () =>{
     console.log('Server is running on port: 8000')
