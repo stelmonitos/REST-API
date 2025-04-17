@@ -8,72 +8,14 @@ app.use((req, res, next) => {
     next();
 });
 
+const testimonialRoutes = require('./routes/testimonials.routes.js')
+
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
+app.use('/api', testimonialRoutes);
 
 //ednpoints 
-
-app.get('/testimonials', (req, res) => {
-    res.json(db.testimonials);
-
-});
-
-app.get('/testimonials/random', (req, res) => {
-    const randomTestimonial = db.testimonials[Math.floor(Math.random() * db.testimonials.length)];
-    res.json(randomTestimonial);
-});
-
-app.get('/testimonials/:id', (req, res) => {
-    const id = req.params.id
-    const testimonial = db.testimonials.findIndex(item => String(item.id) === String(id));
-    res.json(db.testimonials[testimonial]);
-});
-
-app.post('/testimonials', (req, res) => {
-    const id = uuidv4();
-    const { author, text } = req.body;
-
-    if(!author || !text){
-        res.json({ message: 'missing value!'});
-    } else {
-        db.testimonials.push({ id, author, text });
-        res.json({ message: 'OK' });
-    }
-});
-
-app.put('/testimonials/:id', (req, res) => {
-    const id = req.params.id;
-    const testimonial = db.testimonials.findIndex(item => String(item.id) === String(id));
-
-    if (!testimonial) {
-        return res.status(404).json({ message: 'Testimonial not found' });
-    }
-
-    const { author, text } = req.body;
-
-    if (!author || !text) {
-        return res.status(400).json({ message: 'Invalid data. Both author and text are required.' });
-    }
-
-    db.testimonials[testimonial] = { ...db.testimonials[testimonial], author, text };
-
-    res.json({ message: 'OK' });
-});
-
-    
-app.delete('/testimonials/:id', (req, res) => {
-    const id = req.params.id
-    const testimonial = db.testimonials.findIndex(item => String(item.id) === String(id));
-
-    if(testimonial !== -1) {
-        db.testimonials.splice(testimonial, 1);
-        res.json({ message: 'OK' });
-    } else {
-        res.status(404).json({ message: 'Testimonial not found' }); // Obsługa błędu
-    }
-})
 
 app.get('/concerts', (req, res) => {
     res.json(db.concerts);
