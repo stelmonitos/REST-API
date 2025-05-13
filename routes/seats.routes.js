@@ -16,20 +16,24 @@ router.get('/seats/:id', (req, res) => {
     const id = req.params.id;
     const seat = db.seats.findIndex(item => String(item.id) === String(id));
     if (!seat){
-        res.json({ message: 'wrong id!'});
+       return res.json({ message: 'wrong id!'});
     } else {
-        res.json(db.seats[seat]);
+       return res.json(db.seats[seat]);
     }
 });
 
 router.post('/seats', (req, res) => {
     const id = uuidv4();
     const { day, seat, client, email } = req.body
-
+    const isTaken = db.seats.some(item => String(item.seat) === String(seat) && item.day === day);
     if (!day || !seat || !client || !day || !email || !id){
-        res.json({ message: 'error!'});
+       return res.json({ message: 'error!'});
+    } 
+    if(isTaken){
+        return res.status(409).json({ message: 'This seat is already taken!' });
     } else {
-        db.seats.push({ day, seat, client, email, id })
+        const newSeat = { day, seat, client, email, id };
+        db.seats.push(newSeat);
         res.json({ message: 'OK' })
     }
     
