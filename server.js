@@ -1,7 +1,6 @@
 const express = require('express');
-const db = require('./db.js')
-const { v4: uuidv4 } = require('uuid');
 const app = express();
+const cors = require('cors')
 
 
 const testimonialRoutes = require('./routes/testimonials.routes.js');
@@ -11,6 +10,7 @@ const seatRoutes = require('./routes/seats.routes.js')
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
 // ENDPOINTS
 app.use('/api', testimonialRoutes);
