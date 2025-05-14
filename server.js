@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 const cors = require('cors')
 
@@ -11,6 +12,8 @@ const seatRoutes = require('./routes/seats.routes.js')
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '/client/build')));
 
 
 // ENDPOINTS
@@ -22,6 +25,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
 
-app.listen(8000, () =>{
-    console.log('Server is running on port: 8000')
-})
+app.listen(process.env.PORT || 8000, () => {
+  console.log('Server is running on port: 8000');
+});
